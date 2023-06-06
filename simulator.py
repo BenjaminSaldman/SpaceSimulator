@@ -3,7 +3,7 @@ import random
 # from kafka import KafkaProducer
 from datetime import datetime
 import json
-
+from configparser import ConfigParser
 from confluent_kafka import Producer
 
 # Kafka broker address
@@ -13,6 +13,16 @@ bootstrap_servers = 'localhost:9092'
 topic = 'events'
 
 
+def read_ccloud_config(config_file):
+    conf = {}
+    with open(config_file) as fh:
+        for line in fh:
+            line = line.strip()
+            if len(line) != 0 and line[0] != "#":
+                parameter, value = line.strip().split('=', 1)
+                conf[parameter] = value.strip()
+    return conf
+
 
 events = ['GRB', 'ABR', 'UVR', 'XRR', 'CMT']
 with open('BSC.json', 'r') as file:
@@ -20,8 +30,10 @@ with open('BSC.json', 'r') as file:
 conf = {'bootstrap.servers': bootstrap_servers}
 
 # Create Kafka producer
-producer = Producer(conf)
-
+# producer = Producer(conf)
+config_parser = ConfigParser()
+config = dict(config_parser['DEFAULT'])
+producer = Producer(read_ccloud_config("client.properties"))
 data_list = json.loads(json_data)
 sources = ['MMT', 'GOT', 'VLT', 'ST', 'LBT', 'SALT', 'K12', 'HET', 'GTC', 'GMT', 'TMT', 'EELT']
 while True:
@@ -56,5 +68,5 @@ while True:
     json_object = json.loads(input_string)
     # Convert JSON data to string and produce JSON message
     producer.produce(topic, value=json.dumps(json_object).encode('utf-8'))
-    producer.flush()
-    time.sleep(10)
+    #producer.flush()
+    time.sleep(5)
