@@ -1,0 +1,25 @@
+{
+  "name": "spacesimulator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BenjaminSaldman/SpaceSimulator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BenjaminSaldman/SpaceSimulator/issues"
+  },
+  "homepage": "https://github.com/BenjaminSaldman/SpaceSimulator#readme",
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.8.0",
+    "elasticsearch": "^16.7.3",
+    "node-rdkafka": "^2.16.1"
+  }
+}
