@@ -19,8 +19,13 @@
   "homepage": "https://github.com/BenjaminSaldman/SpaceSimulator#readme",
   "dependencies": {
     "@elastic/elasticsearch": "^8.8.0",
+    "axios": "^1.4.0",
+    "cheerio": "^1.0.0-rc.12",
     "elasticsearch": "^16.7.3",
     "node-rdkafka": "^2.16.1",
-    "redis": "^4.6.7"
+    "nstall": "^0.2.0",
+    "redis": "^4.6.7",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6"
   }
 }
