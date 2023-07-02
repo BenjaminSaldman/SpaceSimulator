@@ -24,6 +24,7 @@
     "elasticsearch": "^16.7.3",
     "node-rdkafka": "^2.16.1",
     "nstall": "^0.2.0",
+    "puppeteer": "^20.7.4",
     "redis": "^4.6.7",
     "request": "^2.88.2",
     "request-promise": "^4.2.6"

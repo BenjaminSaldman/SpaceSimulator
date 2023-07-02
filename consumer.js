@@ -73,7 +73,7 @@ consumer("events",({key,value}) => {
   msg = JSON.parse(value);
   console.log(msg);
   client.index({
-    index: 'event',
+    index: 'event1',
       document: msg
     });
   

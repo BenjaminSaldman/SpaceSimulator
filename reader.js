@@ -1,5 +1,4 @@
 const { configFromPath } = require('./util');
-
 const { Client } = require('@elastic/elasticsearch')
 const fs = require('fs')
 const client = new Client({
@@ -13,17 +12,36 @@ const client = new Client({
       rejectUnauthorized: false
     }
   })
-  async function read(){
-  const result =  await client.search({
-    index: 'event',
-    "query": {
-        "match_all" : {}
+
+  async function read_within_dates(startingDate, endingDate,params={}){
+    const result =  await client.search({
+      index: 'event1',
+      "query": {
+          "range" : {
+           "eventTS":{
+                "gte": startingDate,
+                "lte": endingDate,
+            }
+          }
+        }
       }
-    }
-  )
-  await result.hits.hits.forEach((hit)=>{
-    console.log(hit);
-  });
+    )
+  const hits = result.hits.hits.map((hit) => hit._source);
+  return filterListByHashMap(hits, params);
 }
-read();
+function filterListByHashMap(list, hashMap) {
+  const filteredList = list.filter((item) => {
+    return Object.entries(hashMap).every(([key, value]) => item[key] === value);
+  });
+
+  return filteredList;
+}
+const oneWeekAgo = new Date();
+oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+const today = new Date().toISOString();
+read_within_dates(oneWeekAgo.toISOString(), today,{'urgency':1,'star_name':'A9IV'}).then((hits) => {
+  console.log(hits);
+});
+
+module.exports = {read_within_dates}
 
