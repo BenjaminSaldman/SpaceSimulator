@@ -12,7 +12,7 @@ axios.get(`https://api.nasa.gov/neo/rest/v1/feed?start_date=${formattedDate}&api
       const jsonData = response.data;
       // console.log(jsonData);
       const nearEarthObjects = response.data.near_earth_objects;
-      const asteroidsForDate = nearEarthObjects['2023-07-02'];
+      const asteroidsForDate = nearEarthObjects['2023-07-13'];
   
       console.log('Near-Earth Objects for 2023-06-14:');
       // console.log(nearEarthObjects);
