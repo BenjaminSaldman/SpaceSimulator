@@ -70,30 +70,4 @@ exports.configFromPath = async function configFromPath(path) {
 //   .catch(error => {
 //     console.error('Error fetching the website:', error);
 //   });
-const puppeteer = require('puppeteer');
 
-(async () => {
-  // Launch a new browser instance
-  const browser = await puppeteer.launch();
-
-  // Open a new page
-  const page = await browser.newPage();
-
-  // Navigate to the image URL
-  await page.goto('https://www.spaceweatherlive.com/images/SDO/SDO_HMIIF_1024.jpg');
-
-  // Wait for the image to load
-  await page.waitForSelector('img');
-
-  // Get the image source URL
-  const imageUrl = await page.$eval('img', (img) => img.src);
-
-  // Save the image
-  await page.screenshot({ path: 'image.jpg' });
-
-  // Close the browser
-  await browser.close();
-
-  console.log('Image saved: image.jpg');
-  console.log('Image URL:', imageUrl);
-})();
