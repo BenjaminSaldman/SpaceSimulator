@@ -71,3 +71,39 @@ exports.configFromPath = async function configFromPath(path) {
 //     console.error('Error fetching the website:', error);
 //   });
 
+const puppeteer = require('puppeteer');
+
+async function takeCombinedScreenshot() {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+
+  await page.goto('https://www.spaceweatherlive.com/en/solar-activity.html');
+
+  await page.waitForSelector('.graph-md'); // Wait for the graph to be visible
+  await page.waitForSelector('.row.my-1.text-center'); // Wait for the other element to be visible
+
+  const graphElement = await page.$('.graph-md'); // Select the graph element
+  const otherElement = await page.$('.row.my-1.text-center'); // Select the other element
+
+  const graphBoundingBox = await graphElement.boundingBox();
+  const otherElementBoundingBox = await otherElement.boundingBox();
+
+  const combinedBoundingBox = {
+    x: Math.min(graphBoundingBox.x, otherElementBoundingBox.x),
+    y: Math.min(graphBoundingBox.y, otherElementBoundingBox.y),
+    width: Math.max(graphBoundingBox.x + graphBoundingBox.width, otherElementBoundingBox.x + otherElementBoundingBox.width) - Math.min(graphBoundingBox.x, otherElementBoundingBox.x),
+    height: Math.max(graphBoundingBox.y + graphBoundingBox.height, otherElementBoundingBox.y + otherElementBoundingBox.height) - Math.min(graphBoundingBox.y, otherElementBoundingBox.y),
+  };
+
+  const screenshotOptions = { path: 'combined-screenshot.png' }; // Set the path and filename for the combined screenshot
+
+  await page.screenshot({ ...screenshotOptions, clip: combinedBoundingBox });
+
+  console.log('Combined screenshot saved.');
+
+  await browser.close();
+}
+
+takeCombinedScreenshot();
+
+
