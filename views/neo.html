@@ -11,7 +11,8 @@
     <thead>
       <tr>
         <th>Name</th>
-        <th>Estimated Diameter (km)</th>
+        <th>Estimated Diameter (km) - Min</th>
+        <th>Estimated Diameter (km) - Max</th>
         <th>Close Approach Date</th>
       </tr>
     </thead>
@@ -30,7 +31,8 @@
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${neoObject.name}</td>
-            <td>${neoObject.estimatedDiameter}</td>
+            <td>${neoObject.estimatedDiameter.min} km</td>
+            <td>${neoObject.estimatedDiameter.max} km</td>
             <td>${neoObject.closeApproachDate}</td>
           `;
           neoTableBody.appendChild(row);
