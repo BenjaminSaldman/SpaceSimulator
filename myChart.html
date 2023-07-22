@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Graph Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <canvas id="myChart" width="400" height="200"></canvas>
+  <script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    const labels = JSON.parse('[1,2,3]');
+    const dataPoints = JSON.parse('[10,20,35]');
+    const xAxisLabel = 'X-Axis Label';
+    const yAxisLabel = 'Y-Axis Label';
+    const chartLabel = 'My Chart';
+
+    const data = {
+      labels: labels,
+      datasets: [{
+        label: chartLabel,
+        data: dataPoints,
+        borderColor: 'rgba(0, 120, 200, 1)',
+        backgroundColor: 'rgba(0, 120, 200, 0.2)',
+        pointBackgroundColor: 'white',
+        pointBorderColor: 'rgba(0, 120, 200, 1)',
+        pointBorderWidth: 2,
+        borderWidth: 2,
+      }]
+    };
+
+    const config = {
+      type: 'line',
+      data: data,
+      options: {
+        responsive: false,
+        scales: {
+          x: {
+            type: 'linear',
+            title: {
+              display: true,
+              text: xAxisLabel,
+              font: {
+                size: 16,
+                weight: 'bold',
+              },
+            },
+          },
+          y: {
+            title: {
+              display: true,
+              text: yAxisLabel,
+              font: {
+                size: 16,
+                weight: 'bold',
+              },
+            },
+          },
+        },
+      },
+    };
+
+    new Chart(ctx, config);
+  </script>
+</body>
+</html>

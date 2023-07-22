@@ -21,6 +21,8 @@
   "dependencies": {
     "@elastic/elasticsearch": "^8.8.0",
     "axios": "^1.4.0",
+    "canvas": "^2.11.2",
+    "chartjs-node-canvas": "^4.1.6",
     "cheerio": "^1.0.0-rc.12",
     "ejs": "^3.1.9",
     "elasticsearch": "^16.7.3",

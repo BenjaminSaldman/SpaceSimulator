@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Graph Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
+  <style>
+    /* Center the canvas element */
+    body, html {
+      height: 100%;
+      display: flex;
+      flex-direction: column; /* Display content in a column */
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      font-size: 36px;
+      text-align: center;
+      margin-top: 10px; /* Adjust the top margin for spacing */
+      color: #333;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    canvas {
+      /* Customize the chart container size */
+      width: 800px;
+      height: 400px;
+    }
+    .other-pages {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .other-pages li {
+      list-style: none;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .other-pages a {
+      text-decoration: none;
+      color: #333;
+    }
+
+    .other-pages i {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Distribution Of Near Earth Objects In The Past Month</h1>
+  <ul class="other-pages">
+    <li>
+      <a href="/dashboard">
+        <i class="fas fa-chart-bar"></i>
+        Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="/nasa_graph">
+        <i class="fas fa-satellite"></i>
+        NASA Objects Graph
+      </a>
+    </li>
+    <li>
+      <a href="/neotable">
+        <i class="fas fa-satellite"></i>
+        NASA Objects Table
+      </a>
+    </li>
+    <li>
+      <a href="/">
+        <i class="fas fa-sun"></i>
+        Sun Info
+      </a>
+    </li>
+  </ul>
+  <canvas id="myChart"></canvas>
+  <script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    const labels = JSON.parse('<%- JSON.stringify(labels) %>');
+    const dataPoints = JSON.parse('<%- JSON.stringify(dataPoints) %>');
+    const xAxisLabel = '<%= xAxisLabel %>';
+    const yAxisLabel = '<%= yAxisLabel %>';
+    const chartLabel = '<%= chartLabel %>';
+
+    const data = {
+      labels: labels,
+      datasets: [{
+        label: chartLabel,
+        data: dataPoints,
+        borderColor: 'rgba(0, 120, 200, 1)',
+        backgroundColor: 'rgba(0, 120, 200, 0.2)',
+        pointBackgroundColor: 'white',
+        pointBorderColor: 'rgba(0, 120, 200, 1)',
+        pointBorderWidth: 2,
+        borderWidth: 2,
+      }]
+    };
+
+    const config = {
+      type: 'line',
+      data: data,
+      options: {
+        responsive: false,
+        scales: {
+          x: {
+            type: 'linear',
+            title: {
+              display: true,
+              text: xAxisLabel,
+              font: {
+                size: 16,
+                weight: 'bold',
+              },
+            },
+          },
+          y: {
+            title: {
+              display: true,
+              text: yAxisLabel,
+              font: {
+                size: 16,
+                weight: 'bold',
+              },
+            },
+          },
+        },
+      },
+    };
+
+    new Chart(ctx, config);
+  </script>
+</body>
+</html>
