@@ -3,7 +3,10 @@ const { configFromPath } = require('./util');
 
 const { Client } = require('@elastic/elasticsearch')
 const fs = require('fs')
-
+const WebSocket = require('ws');
+const redis = require('redis');
+const redis_client = redis.createClient('redis://localhost:6379');
+// Create a WebSocket server on port 8080
 function createConfigMap(config) {
   if (config.hasOwnProperty('security.protocol')) {
     return {
@@ -69,12 +72,23 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-consumer("events",({key,value}) => {
+consumer("events",async ({key,value}) => {
   msg = JSON.parse(value);
   console.log(msg);
+  wss.on('connection', async (ws) => {
+    var m;
+    if (msg.urgency>=4){
+      m = `Urgency level: ${msg.urgency}, event type: ${msg.eventType}, source: ${msg.eventSource}`;
+      const blinkingMessageInterval = setInterval(() => {
+        const message = { text: m, blinking: true };
+        ws.send(JSON.stringify(message));
+      }, 1000);
+    }
+    });
   client.index({
     index: 'event1',
-      document: msg
+    id: msg.eventTS,
+    document: msg
     });
   
 })
@@ -82,3 +96,22 @@ consumer("events",({key,value}) => {
     console.error(`Something went wrong:\n${err}`);
     process.exit(1);
   });
+const wss = new WebSocket.Server({ port: 8080 });
+// wss.on('connection', async (ws) => {
+//   console.log('Client connected.');
+//   await redis_client.connect();
+//   const msg = await (redis_client.get("Urgent event"));
+//   await redis_client.quit();
+//   var m;
+//   if (msg != null){
+//     const m2 = JSON.parse(msg);
+//     m = `Urgency level: ${msg.urgency}, event type: ${m2.eventType}, source: ${m2.eventSource}`;
+//     const blinkingMessageInterval = setInterval(() => {
+//       const message = { text: m, blinking: true };
+//       ws.send(JSON.stringify(message));
+//     }, 1000);
+//   }
+//   // Send blinking messages to the client
+//   // sendBlinkingMessage(ws, 'This is a blinking message!', 500);
+// });
+

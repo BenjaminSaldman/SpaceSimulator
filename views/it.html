@@ -74,8 +74,8 @@
 
   <script>
     // Establish a WebSocket connection to the backend
-    const socket = new WebSocket('ws://localhost:3000/websocket');
-
+    const socket = new WebSocket('ws://localhost:8080');
+    
     // Handle messages received from the server
     socket.addEventListener('message', (event) => {
       const message = JSON.parse(event.data);

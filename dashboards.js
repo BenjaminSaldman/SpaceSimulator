@@ -15,20 +15,21 @@ const client = new Client({
   })
 const redis_client = redis.createClient('redis://localhost:6379');
 async function read_within_dates(startingDate, endingDate,params={}){
-    const result =  await client.search({
-      index: 'event1',
-      "query": {
-          "range" : {
-           "eventTS":{
-                "gte": startingDate,
-                "lte": endingDate,
-            }
+  const result =  await client.search({
+    index: 'event1',
+    "query": {
+        "range" : {
+         "eventTS":{
+              "gte": startingDate,
+              "lte": endingDate,
           }
         }
-      }
-    )
-  const hits = result.hits.hits.map((hit) => hit._source);
-  return filterListByHashMap(hits, params);
+      },
+      "size": 10000
+    }
+  )
+const hits = result.hits.hits.map((hit) => hit._source).sort((a, b) => new Date(b.eventTS)-new Date(a.eventTS) );
+return filterListByHashMap(hits, params);
 }
 function filterListByHashMap(list, hashMap) {
   const filteredList = list.filter((item) => {
