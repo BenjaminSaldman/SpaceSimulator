@@ -33,10 +33,9 @@ app.post('/search', async (req, res) => {
     var query={};
     if (event_type){query['eventType']=event_type;}
     if (telescope){query['eventSource']=telescope;}
-    console.log(format_startDate);
-    console.log(format_endDate);
+
     const result = await es.read_within_dates(format_startDate, format_endDate,query);
-    console.log(result);
+    // console.log(result);
     res.render('temp.ejs', { entries: result });
     
 });

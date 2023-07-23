@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-header h1 {
+      font-size: 24px;
+    }
+
+    .widget-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .widget {
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+
+    .widget h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .blinking {
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        background-color: #ff0000;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard">
+    <div class="dashboard-header">
+      <h1>Dashboard</h1>
+    </div>
+
+    <div class="widget-container">
+      <div class="widget">
+        <h2>Widget 1</h2>
+        <!-- Add an empty element to display the blinking message -->
+        <div id="message-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Establish a WebSocket connection to the backend
+    const socket = new WebSocket('ws://localhost:3000/websocket');
+
+    // Handle messages received from the server
+    socket.addEventListener('message', (event) => {
+      const message = JSON.parse(event.data);
+      displayMessage(message);
+    });
+
+    // Function to display the blinking message with a blinking background
+    function displayMessage(message) {
+      const messageContainer = document.getElementById('message-container');
+      messageContainer.innerText = message.text;
+      
+      if (message.blinking) {
+        messageContainer.classList.add('blinking');
+        
+        // Stop blinking after 10 seconds
+        setTimeout(() => {
+          messageContainer.classList.remove('blinking');
+        }, 10000);
+      }
+    }
+  </script>
+</body>
+
+</html>
