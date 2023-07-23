@@ -104,6 +104,6 @@ async function takeCombinedScreenshot() {
   await browser.close();
 }
 
-takeCombinedScreenshot();
+//takeCombinedScreenshot();
 
 

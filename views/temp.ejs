@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Date Search App</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<style>
+  body {
+    text-align: center;
+  }
+
+  .search-container {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #dddddd;
+    text-align: middle;
+    padding: 8px;
+    vertical-align: middle;
+  }
+
+  h1 {
+    font-size: 36px;
+    margin-top: 50px;
+    color: #333;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  th {
+    background-color: #FFDAB9; 
+    font-weight: bold;
+  }
+
+  td {
+    background-color: #FFF8DC; 
+  }
+</style>
+<body>
+  <h1>Date Search App</h1>
+  <div class="search-container">
+    <form action="/search_table_post" method="post">
+      <label for="startDate">Start Date:</label>
+      <input type="date" id="startDate" name="startDate">
+
+      <label for="endDate">End Date:</label>
+      <input type="date" id="endDate" name="endDate">
+
+      <label for="event">Type of event:</label>
+      <input type="text" id="event" name="event">
+
+      <label for="telescope">Telescope name:</label>
+      <input type="text" id="telescope" name="telescope">
+
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <div>
+    <table>
+      <thead>
+        <tr>
+          <th>Star Name</th>
+          <th>Event type</th>
+          <th>Telescope</th>
+          <th>Urgency</th>
+          <th>Event date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% entries.forEach(neoObject => { %>
+        <tr>
+          <td><%= neoObject.star_name %></td>
+          <td><%= neoObject.eventType %></td>
+          <td><%= neoObject.eventSource %></td>
+          <td><%= neoObject.urgency %></td>
+          <td><%= neoObject.eventTS %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

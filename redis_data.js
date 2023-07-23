@@ -1,5 +1,4 @@
 const axios = require('axios');
-const express = require('express');
 const currentDate = new Date();
 const oneMonthAgo = new Date();
 const threWeeksAgo = new Date();
@@ -27,7 +26,6 @@ async function callAsteroidAPI() {
         .then(response => {
         // Process the response data and create the graph
         const asteroidData = response.data;
-        //console.log(createAsteroidGraph(asteroidData));
         createAsteroidGraph(asteroidData).then((res) => {
             for (const key in res) {
                 sizeCount[key] += res[key];
@@ -84,7 +82,7 @@ function formatDate(date) {
 
 const redis = require('redis');
 const client = redis.createClient('redis://localhost:6379');
-async function connect_and_publish(){
+async function get_neo_graph_data(){
     var ret = {};
     await client.connect();
     await client.get('last updated neo').then(async (reply, err) => {
@@ -178,4 +176,4 @@ async function get_neo_data(){
 client.quit();
 return ret;
 }
-module.exports = { connect_and_publish, get_neo_data }
+module.exports = { get_neo_graph_data, get_neo_data }

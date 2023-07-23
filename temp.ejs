@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Date Search App</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <h1>Date Search App</h1>
+  <div>
+    <form action="/search" method="post">
+      <label for="startDate">Start Date:</label>
+      <input type="date" id="startDate" name="startDate">
+
+      <label for="endDate">End Date:</label>
+      <input type="date" id="endDate" name="endDate">
+
+      <label for="searchText">Search Text:</label>
+      <input type="text" id="searchText" name="searchText">
+
+      <!-- Add the new search text field -->
+      <label for="additionalText">Additional Text:</label>
+      <input type="text" id="additionalText" name="additionalText">
+
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <div>
+    <h2>Search Results:</h2>
+    <ul>
+      <% entries.forEach(entry => { %>
+        <li><strong><%= entry.date %></strong>: <%= entry.text %></li>
+      <% }); %>
+    </ul>
+  </div>
+</body>
+</html>

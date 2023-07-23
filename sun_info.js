@@ -46,7 +46,7 @@ async function takeCombinedScreenshot() {
     height: Math.max(graphBoundingBox.y + graphBoundingBox.height, otherElementBoundingBox.y + otherElementBoundingBox.height) - Math.min(graphBoundingBox.y, otherElementBoundingBox.y),
   };
 
-  const screenshotOptions = { path: 'combined-screenshot.png' }; // Set the path and filename for the combined screenshot
+  const screenshotOptions = { path: `images/graph.png` }; // Set the path and filename for the combined screenshot
 
   await page.screenshot({ ...screenshotOptions, clip: combinedBoundingBox });
 
@@ -60,6 +60,7 @@ async function sun_info() {
     await getSunInfo('https://sohowww.nascom.nasa.gov/data/realtime/c2/512/latest.jpg','coronal_mass_ejections.jpg');
     await getSunInfo('https://www.spaceweatherlive.com/images/SDO/latest_512_0131.jpg','solar_flares.jpg');
     await getSunInfo('https://stereo-ssc.nascom.nasa.gov/beacon/euvi_195_heliographic.gif','far_side.jpg');
+    await takeCombinedScreenshot();
 }
 async function update_images(){
   try {
@@ -69,7 +70,7 @@ async function update_images(){
     await getSunInfo('https://www.spaceweatherlive.com/images/SDO/latest_512_0131.jpg','solar_flares.jpg');
     await getSunInfo('https://stereo-ssc.nascom.nasa.gov/beacon/euvi_195_heliographic.gif','far_side.jpg');
     await takeCombinedScreenshot();
-    setTimeout(update_images, 1000000);
+    setTimeout(update_images, 1000*60);
   }catch (error) {
     console.log(error);
   }
