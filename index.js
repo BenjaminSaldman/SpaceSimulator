@@ -38,9 +38,31 @@ app.get('/', (req, res) => {
   //sun_info();
   
 });
-app.get('/dashboard', (req, res) => {
-    const filePath = path.join(viewsFolder, 'dashboard.html');
-    res.sendFile(filePath);
+app.get('/dashboard', async (req, res) => {
+    var urgencies = {'1':0,'2':0,'3':0,'4':0,'5':0};
+    var events ={'GRB':0,'ABR':0,'UVR':0,'XRR':0,'CMT':0}
+    
+    dateObj = new Date();
+    dateObj.setDate(dateObj.getDate() - 7);
+    dateObj.setHours(0, 0, 0, 0);
+    const format_startDate = dateObj.toISOString();
+    dateObj2 = new Date();
+    dateObj2.setHours(23, 59, 0, 0);
+    const format_endDate = dateObj2.toISOString();
+    await es.read_within_dates(format_startDate, format_endDate,{}).then((hits) => {
+        for (var i = 0; i < hits.length; i++) {
+            urgencies[hits[i].urgency] += 1;
+            events[hits[i].eventType] += 1;
+        }
+      }); 
+    console.log(urgencies);
+    console.log(events);
+    const data1Values = Object.values(urgencies);
+    const data2Values = Object.values(events);
+    const data3Values = Object.values(events);
+    const filePath = path.join(viewsFolder, 'dashboard.ejs');
+    res.render(filePath, { data1Values, data2Values, data3Values });
+    //res.sendFile(filePath);
   });
   app.get('/neotable', async (req, res) => {
     const neoData = await connect_and_publish.get_neo_data();
