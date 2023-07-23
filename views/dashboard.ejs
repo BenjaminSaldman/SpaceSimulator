@@ -1,0 +1,114 @@
+<!-- your_ejs_file.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graphs with Cards</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .card {
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin: 10px;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h3>Graph 1: Bar Chart</h3>
+    <canvas id="barChart" width="300" height="150"></canvas>
+  </div>
+
+  <div class="card">
+    <h3>Graph 2: Line Chart</h3>
+    <canvas id="lineChart" width="300" height="150"></canvas>
+  </div>
+
+  <div class="card">
+    <h3>Graph 3: Pie Chart</h3>
+    <canvas id="pieChart" width="300" height="150"></canvas>
+  </div>
+
+  <script>
+    // Function to update the chart data
+    function updateChartData() {
+      // Sample data for the charts
+    //   const data1Values = <%= JSON.stringify(data1Values) %>;
+    //   const data2Values = <%= JSON.stringify(data2Values) %>;
+    //   const data3Values = <%= JSON.stringify(data3Values) %>;
+      const data1Values = JSON.parse('<%- JSON.stringify(data1Values) %>');
+      const data2Values = JSON.parse('<%- JSON.stringify(data2Values) %>');
+        const data3Values = JSON.parse('<%- JSON.stringify(data3Values) %>');
+      
+
+      // Update data for Chart 1
+      const data1 = {
+        labels: ['GRB', 'ABR', 'UVR', 'XRR', 'CMT'],
+        datasets: [{
+          label: 'Data 1',
+          data: data1Values,
+          backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(54, 99, 132, 0.6)'],
+          borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(132, 99, 132, 1)'],
+          borderWidth: 1
+        }]
+      };
+
+      // Update data for Chart 2
+      const data2 = {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Data 2',
+          data: data2Values,
+          borderColor: 'rgba(75, 192, 192, 1)',
+          fill: false
+        }]
+      };
+
+      // Update data for Chart 3
+      const data3 = {
+        labels: [1, 2, 3, 4, 5],
+        datasets: [{
+          data: data3Values,
+          backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(54, 99, 132, 0.6)'],
+          hoverBackgroundColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(132, 99, 132, 1)']
+        }]
+      };
+
+      // Create the charts
+      const barChart = new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: data1,
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      const lineChart = new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: data2,
+        options: {}
+      });
+
+      const pieChart = new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: data3,
+        options: {}
+      });
+    }
+
+    // Call the function to update the chart data initially
+    updateChartData();
+  </script>
+</body>
+</html>
