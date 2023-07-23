@@ -88,11 +88,22 @@ app.get('/dashboard', (req, res) => {
   // Route to handle search form submission
   app.post('/search_table_post', async (req, res) => {
       const { startDate, endDate, event_type,telescope } = req.body;
-      const dateObj = new Date(startDate);
+      var dateObj;
+      if(!startDate){
+        dateObj = new Date();
+        dateObj.setDate(dateObj.getDate() - 7);
+      }else{
+        dateObj = new Date(startDate);
+      }
       dateObj.setHours(0, 0, 0, 0);
       const format_startDate = dateObj.toISOString();
-      const dateObj2 = new Date(endDate);
-      dateObj2.setHours(0, 0, 0, 0);
+      var dateObj2;
+      if(!endDate){
+        dateObj2 = new Date();
+      }else{
+        dateObj2 = new Date(endDate);
+      }
+      dateObj2.setHours(23, 59, 0, 0);
       const format_endDate = dateObj2.toISOString();
       var query={};
       if (event_type){query['eventType']=event_type;}
@@ -100,7 +111,6 @@ app.get('/dashboard', (req, res) => {
       console.log(format_startDate);
       console.log(format_endDate);
       const result = await es.read_within_dates(format_startDate, format_endDate,query);
-      console.log(result);
       res.render('temp', { entries: result });
       
   });

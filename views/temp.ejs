@@ -67,9 +67,8 @@
     <table>
       <thead>
         <tr>
-          <th>Star Name</th>
           <th>Event type</th>
-          <th>Telescope</th>
+          <th>Source</th>
           <th>Urgency</th>
           <th>Event date</th>
         </tr>
@@ -77,7 +76,6 @@
       <tbody>
         <% entries.forEach(neoObject => { %>
         <tr>
-          <td><%= neoObject.star_name %></td>
           <td><%= neoObject.eventType %></td>
           <td><%= neoObject.eventSource %></td>
           <td><%= neoObject.urgency %></td>
