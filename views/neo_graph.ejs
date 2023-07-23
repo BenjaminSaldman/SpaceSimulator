@@ -93,23 +93,19 @@
       datasets: [{
         label: chartLabel,
         data: dataPoints,
-        borderColor: 'rgba(0, 120, 200, 1)',
-        backgroundColor: 'rgba(0, 120, 200, 0.2)',
-        pointBackgroundColor: 'white',
-        pointBorderColor: 'rgba(0, 120, 200, 1)',
-        pointBorderWidth: 2,
-        borderWidth: 2,
+        backgroundColor: 'rgba(0, 120, 200, 0.5)', // Set the color for bars
+        borderWidth: 1, // Set the border width for bars
       }]
     };
 
     const config = {
-      type: 'line',
+      type: 'bar', // Change chart type to 'bar'
       data: data,
       options: {
         responsive: false,
         scales: {
           x: {
-            type: 'linear',
+            type: 'category', // Use category scale for the x-axis
             title: {
               display: true,
               text: xAxisLabel,

@@ -1,17 +1,96 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Dashboard</title>
-  </head>
-  <body>
-    <h1>Hello, World!</h1>
-    <ul class="other-pages">
-        <li>
-          <a href="/">
-            <i class="fas fa-chart-bar"></i>
-            Dashboard
-          </a>
-        </li>
-        <li>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graphs with Cards</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .card {
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin: 10px;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h3>Graph 1: Bar Chart</h3>
+    <canvas id="barChart" width="300" height="150"></canvas>
+  </div>
+
+  <div class="card">
+    <h3>Graph 2: Line Chart</h3>
+    <canvas id="lineChart" width="300" height="150"></canvas>
+  </div>
+
+  <div class="card">
+    <h3>Graph 3: Pie Chart</h3>
+    <canvas id="pieChart" width="300" height="150"></canvas>
+  </div>
+
+  <script>
+    // Sample data for the charts
+    const data1 = {
+      labels: ['A', 'B', 'C', 'D'],
+      datasets: [{
+        label: 'Data 1',
+        data: [10, 25, 12, 20],
+        backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)'],
+        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)'],
+        borderWidth: 1
+      }]
+    };
+
+    const data2 = {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Data 2',
+        data: [20, 15, 30, 25, 35, 28],
+        borderColor: 'rgba(75, 192, 192, 1)',
+        fill: false
+      }]
+    };
+
+    const data3 = {
+      labels: ['Red', 'Blue', 'Yellow', 'Green'],
+      datasets: [{
+        data: [40, 30, 15, 15],
+        backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)'],
+        hoverBackgroundColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)']
+      }]
+    };
+
+    // Create the charts
+    const barChart = new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: data1,
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    const lineChart = new Chart(document.getElementById('lineChart'), {
+      type: 'line',
+      data: data2,
+      options: {}
+    });
+
+    const pieChart = new Chart(document.getElementById('pieChart'), {
+      type: 'pie',
+      data: data3,
+      options: {}
+    });
+  </script>
+</body>
 </html>
