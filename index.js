@@ -32,13 +32,13 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 app.set('view engine', 'ejs'); // Set EJS as the view engine
 
 // Define a route to serve the gallery.html file
-app.get('/', (req, res) => {
+app.get('/sun_info', (req, res) => {
     const filePath = path.join(viewsFolder, 'sun_info.html');
     res.sendFile(filePath);
   //sun_info();
   
 });
-app.get('/dashboard', async (req, res) => {
+app.get('/', async (req, res) => {
     var urgencies = {'1':0,'2':0,'3':0,'4':0,'5':0};
     var events ={'GRB':0,'ABR':0,'UVR':0,'XRR':0,'CMT':0}
     dateObj = new Date();
@@ -46,6 +46,7 @@ app.get('/dashboard', async (req, res) => {
     dateObj.setHours(0, 0, 0, 0);
     const format_startDate = dateObj.toISOString();
     dateObj2 = new Date();
+    dateObj2.setDate(dateObj2.getDate() + 1);
     dateObj2.setHours(23, 59, 0, 0);
     const format_endDate = dateObj2.toISOString();
     await es.read_within_dates(format_startDate, format_endDate,{}).then((hits) => {
@@ -64,9 +65,19 @@ app.get('/dashboard', async (req, res) => {
     const todayFormat = today.toISOString();
     today.setHours(23, 59, 0, 0);
     const todayFormat2 = today.toISOString();
+    var last_event;
     var hours = {'00:00': 0, '01:00': 0, '02:00': 0, '03:00': 0, '04:00': 0, '05:00': 0, '06:00': 0, '07:00': 0, '08:00': 0, '09:00': 0, '10:00': 0, '11:00': 0, '12:00': 0, '13:00': 0, '14:00': 0, '15:00': 0, '16:00': 0, '17:00': 0, '18:00': 0, '19:00': 0, '20:00': 0, '21:00': 0, '22:00': 0, '23:00': 0};
+    var total_urgenices = 0;
+    var total_events = 0; 
     await es.read_within_dates(todayFormat, todayFormat2,{}).then((hits) => {
         for (var i = 0; i < hits.length; i++) {
+            if (i == 0){
+                last_event = "Type: "+hits[i].eventType+", Source:"+hits[i].eventSource;
+            }
+            total_events += 1;
+            if (hits[i].urgency>=4){
+                total_urgenices += 1;
+            }
             var date = new Date(hits[i].eventTS);
             var hour = date.getHours();
             if (hour < 10){
@@ -82,13 +93,13 @@ app.get('/dashboard', async (req, res) => {
       const data2Values = Object.values(hours);
       const data2Labels = Object.keys(hours);
       console.log(data1Values);
-      const total_urgenices = data3Values[3]+data3Values[4];
-      const total_events = data1Values.reduce((a, b) => a + b, 0);
+      // const total_urgenices = data3Values[3]+data3Values[4];
+      // const total_events = data1Values.reduce((a, b) => a + b, 0);
       const urg_txt = 'Total Critical Events (4-5): '+total_urgenices.toString();
       const events_txt = 'Total Events: '+total_events.toString();
       //const data3Labels = Object.keys(hours);
     const filePath = path.join(viewsFolder, 'dashboard.ejs');
-    res.render(filePath, { data1Values, data2Values, data3Values, data2Labels, urg_txt, events_txt });
+    res.render(filePath, { data1Values, data2Values, data3Values, data2Labels, urg_txt, events_txt ,last_event });
     //res.sendFile(filePath);
   });
   app.get('/neotable', async (req, res) => {

@@ -4,10 +4,10 @@ const redis = require('redis');
 let redisClient;
 
 // Function to create and return the Redis client instance
-function getRedisClient() {
+async function getRedisClient() {
   if (!redisClient || !redisClient.connected) {
     // If the Redis client doesn't exist or is not connected, create a new one
-    redisClient = redis.createClient('redis://localhost:6379');
+    redisClient = await redis.createClient('redis://localhost:6379');
 
     // Listen for the "ready" event to check if the client is already connected
     redisClient.on('ready', () => {
@@ -30,4 +30,5 @@ function getRedisClient() {
 }
 
 // Export the function to be used in other files
+getRedisClient();
 module.exports = getRedisClient();

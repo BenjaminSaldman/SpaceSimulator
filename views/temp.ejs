@@ -2,7 +2,8 @@
 <html>
 <head>
   <title>Date Search App</title>
-  <link rel="stylesheet" href="/styles.css">
+  <!-- <link rel="stylesheet" href="/styles.css"> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
 <style>
   body {
@@ -42,9 +43,60 @@
   td {
     background-color: #FFF8DC; 
   }
+  .other-pages {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .other-pages li {
+        list-style: none;
+        display: inline-block;
+        margin-right: 10px;
+      }
+
+      .other-pages a {
+        text-decoration: none;
+        color: #333;
+      }
+
+      .other-pages i {
+        margin-right: 5px;
+      }
 </style>
 <body>
   <h1>Date Search App</h1>
+  <ul class="other-pages">
+    <li>
+      <a href="/">
+        <i class="fas fa-chart-bar"></i>
+        Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="/nasa_graph">
+        <i class="fas fa-satellite"></i>
+        NASA Objects Graph
+      </a>
+    </li>
+    <li>
+      <a href="/neotable">
+        <i class="fas fa-satellite"></i>
+        NASA Objects Table
+      </a>
+    </li>
+    <li>
+      <a href="/sun_info">
+        <i class="fas fa-sun"></i>
+        Sun Info
+      </a>
+    </li>
+    <li>
+      <a href="/search_table">
+        <i class="fas fa-search"></i>
+        Search Table
+      </a>
+    </li>
+  </ul>
   <div class="search-container">
     <form action="/search_table_post" method="post">
       <label for="startDate">Start Date:</label>

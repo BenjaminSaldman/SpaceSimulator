@@ -75,19 +75,15 @@ process.on('SIGINT', () => {
 consumer("events",async ({key,value}) => {
   msg = JSON.parse(value);
   console.log(msg);
-  wss.on('connection', async (ws) => {
-    var m;
-    if (msg.urgency>=4){
-      m = `Urgency level: ${msg.urgency}, event type: ${msg.eventType}, source: ${msg.eventSource}`;
-      const blinkingMessageInterval = setInterval(() => {
-        const message = { text: m, blinking: true };
-        ws.send(JSON.stringify(message));
-      }, 1000);
-    }
-    });
+  
   client.index({
     index: 'event1',
     id: msg.eventTS,
+    document: msg
+    });
+  client.index({
+    index: 'lastmsg',
+    id: 'last',
     document: msg
     });
   
@@ -97,6 +93,25 @@ consumer("events",async ({key,value}) => {
     process.exit(1);
   });
 const wss = new WebSocket.Server({ port: 8080 });
+wss.on('connection', async (ws) => {
+  client.get({
+    index: 'lastmsg',
+    id: 'last'
+  }).then((res) => {
+    console.log(res);
+    var m=res._source;
+  if (m.urgency>=4){
+    m = `Type: ${m.eventType}, Source: ${m.eventSource}, Urgency: ${m.urgency}`;
+    console.log(m);
+    const blinkingMessageInterval = setInterval(() => {
+      const message = { text: m, blinking: true };
+      ws.send(JSON.stringify(message));
+    }, 1000);
+  }
+    //ws.send(JSON.stringify(res.body._source));
+  });
+  
+  });
 // wss.on('connection', async (ws) => {
 //   console.log('Client connected.');
 //   await redis_client.connect();
