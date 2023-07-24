@@ -41,7 +41,6 @@ app.get('/', (req, res) => {
 app.get('/dashboard', async (req, res) => {
     var urgencies = {'1':0,'2':0,'3':0,'4':0,'5':0};
     var events ={'GRB':0,'ABR':0,'UVR':0,'XRR':0,'CMT':0}
-    
     dateObj = new Date();
     dateObj.setDate(dateObj.getDate() - 7);
     dateObj.setHours(0, 0, 0, 0);
@@ -57,11 +56,39 @@ app.get('/dashboard', async (req, res) => {
       }); 
     console.log(urgencies);
     console.log(events);
-    const data1Values = Object.values(urgencies);
-    const data2Values = Object.values(events);
-    const data3Values = Object.values(events);
+    const data3Values = Object.values(urgencies);
+    const data1Values = Object.values(events);
+    const today = new Date();
+    today.setDate(today.getDate() - 1);
+    today.setHours(0, 0, 0, 0);
+    const todayFormat = today.toISOString();
+    today.setHours(23, 59, 0, 0);
+    const todayFormat2 = today.toISOString();
+    var hours = {'00:00': 0, '01:00': 0, '02:00': 0, '03:00': 0, '04:00': 0, '05:00': 0, '06:00': 0, '07:00': 0, '08:00': 0, '09:00': 0, '10:00': 0, '11:00': 0, '12:00': 0, '13:00': 0, '14:00': 0, '15:00': 0, '16:00': 0, '17:00': 0, '18:00': 0, '19:00': 0, '20:00': 0, '21:00': 0, '22:00': 0, '23:00': 0};
+    await es.read_within_dates(todayFormat, todayFormat2,{}).then((hits) => {
+        for (var i = 0; i < hits.length; i++) {
+            var date = new Date(hits[i].eventTS);
+            var hour = date.getHours();
+            if (hour < 10){
+                hour = '0'+hour.toString()+':00';
+            }else{
+                hour = hour.toString()+':00';
+            }
+            
+            hours[hour] += 1;
+        }
+      });
+      console.log(Object.keys(hours));
+      const data2Values = Object.values(hours);
+      const data2Labels = Object.keys(hours);
+      console.log(data1Values);
+      const total_urgenices = data3Values[3]+data3Values[4];
+      const total_events = data1Values.reduce((a, b) => a + b, 0);
+      const urg_txt = 'Total Critical Events (4-5): '+total_urgenices.toString();
+      const events_txt = 'Total Events: '+total_events.toString();
+      //const data3Labels = Object.keys(hours);
     const filePath = path.join(viewsFolder, 'dashboard.ejs');
-    res.render(filePath, { data1Values, data2Values, data3Values });
+    res.render(filePath, { data1Values, data2Values, data3Values, data2Labels, urg_txt, events_txt });
     //res.sendFile(filePath);
   });
   app.get('/neotable', async (req, res) => {

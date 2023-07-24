@@ -1,4 +1,3 @@
-<!-- your_ejs_file.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +8,30 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column; /* Set the flex direction to column */
+      justify-content: center; /* Center content horizontally */
+      align-items: center; /* Center content vertically */
+      height: 100vh; /* Set the height of the body to the viewport height */
+    }
+    .card-upper-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .card-upper {
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin: 10px;
+      width: 300px;
+      height: 100px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     .card {
       padding: 20px;
@@ -21,32 +44,48 @@
   </style>
 </head>
 <body>
-  <div class="card">
-    <h3>Graph 1: Bar Chart</h3>
-    <canvas id="barChart" width="300" height="150"></canvas>
+  <div class="card-upper-container">
+    <div class="card-upper">
+      <img src="images/alert.png" alt="Alert" width="50" height="50">
+      <canvas id="l1" width="300" height="150"></canvas>
+    </div>
+    <div class="card-upper">
+      <img src="images/total.jpg" alt="Alert" width="50" height="50">
+      <canvas id="l2" width="300" height="150"></canvas>
+    </div>
+    <div class="card-upper">
+      <h3>Graph 6: Last Event</h3>
+      <canvas id="l3" width="300" height="150"></canvas>
+    </div>
   </div>
+  <div class="card-container">
+    <div class="card">
+      <h3>Graph 1: Bar Chart</h3>
+      <canvas id="barChart" width="300" height="150"></canvas>
+    </div>
 
-  <div class="card">
-    <h3>Graph 2: Line Chart</h3>
-    <canvas id="lineChart" width="300" height="150"></canvas>
-  </div>
+    <div class="card">
+      <h3>Graph 2: Line Chart</h3>
+      <canvas id="lineChart" width="300" height="150"></canvas>
+    </div>
 
-  <div class="card">
-    <h3>Graph 3: Pie Chart</h3>
-    <canvas id="pieChart" width="300" height="150"></canvas>
+    <div class="card">
+      <h3>Graph 3: Pie Chart</h3>
+      <canvas id="pieChart" width="300" height="150"></canvas>
+    </div>
   </div>
 
   <script>
-    // Function to update the chart data
+    // Function to update the chart data and canvas with dynamic string
     function updateChartData() {
       // Sample data for the charts
-    //   const data1Values = <%= JSON.stringify(data1Values) %>;
-    //   const data2Values = <%= JSON.stringify(data2Values) %>;
-    //   const data3Values = <%= JSON.stringify(data3Values) %>;
+      //   const data1Values = <%= JSON.stringify(data1Values) %>;
+      //   const data2Values = <%= JSON.stringify(data2Values) %>;
+      //   const data3Values = <%= JSON.stringify(data3Values) %>;
       const data1Values = JSON.parse('<%- JSON.stringify(data1Values) %>');
       const data2Values = JSON.parse('<%- JSON.stringify(data2Values) %>');
-        const data3Values = JSON.parse('<%- JSON.stringify(data3Values) %>');
-      
+      const data2Labels = JSON.parse('<%- JSON.stringify(data2Labels) %>');
+      const data3Values = JSON.parse('<%- JSON.stringify(data3Values) %>');
 
       // Update data for Chart 1
       const data1 = {
@@ -62,7 +101,7 @@
 
       // Update data for Chart 2
       const data2 = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        labels: data2Labels,
         datasets: [{
           label: 'Data 2',
           data: data2Values,
@@ -105,9 +144,27 @@
         data: data3,
         options: {}
       });
+
+      // Dynamic string received from the router (replace this with your actual value)
+      const urgencies_str = JSON.parse('<%- JSON.stringify(urg_txt) %>');
+
+      // Update the canvas labeled "l1" with the dynamic string and image
+      const canvasL1 = document.getElementById('l1');
+      const ctxL1 = canvasL1.getContext('2d');
+      ctxL1.clearRect(0, 0, canvasL1.width, canvasL1.height); // Clear the canvas before updating
+      ctxL1.font = '20px Arial';
+      ctxL1.fillText(urgencies_str, 15, 20); // Adjust the position of the string as needed
+      ctxL1.stroke();
+      const canvasL2 = document.getElementById('l2');
+      const events_str = JSON.parse('<%- JSON.stringify(events_txt) %>');
+      const ctxL2 = canvasL2.getContext('2d');
+      ctxL2.clearRect(0, 0, canvasL2.width, canvasL2.height); // Clear the canvas before updating
+      ctxL2.font = '20px Arial';
+      ctxL2.fillText(events_str, 15, 20); // Adjust the position of the string as needed
+      ctxL2.stroke();
     }
 
-    // Call the function to update the chart data initially
+    // Call the function to update the chart data and canvas with dynamic string initially
     updateChartData();
   </script>
 </body>
