@@ -1,5 +1,5 @@
 const Kafka = require('node-rdkafka');
-const { configFromPath } = require('./util');
+const { configFromPath } = require('../util');
 
 const { Client } = require('@elastic/elasticsearch')
 const fs = require('fs')
@@ -42,7 +42,7 @@ function createConsumer(config, onData) {
 var consumers = []
 
 async function consumer(topic, func) {
-  let configPath = "client.properties"
+  let configPath = "../client.properties"
   const config = await configFromPath(configPath);
   const consumer = await createConsumer(config, func);
   consumers.push([topic, consumer]);
@@ -58,7 +58,7 @@ const client = new Client({
     password: 'xg4Pm4rK-jj0sSE66Tlq'
   },
   tls: {
-    ca: fs.readFileSync('./http_ca.crt'),
+    ca: fs.readFileSync('../http_ca.crt'),
     rejectUnauthorized: false
   }
 })
@@ -75,18 +75,26 @@ process.on('SIGINT', () => {
 consumer("events",async ({key,value}) => {
   msg = JSON.parse(value);
   console.log(msg);
-  
   client.index({
     index: 'event1',
     id: msg.eventTS,
     document: msg
     });
-    if (msg.urgency>=4){
+
+  if (msg.urgency>=4){
+    client.index({
+      index: 'lastmsg',
+      id: 'last',
+      document: msg
+      });
+  }
+  const lastUpdated = formatDate(new Date());
   client.index({
-    index: 'lastmsg',
+    index: 'lastupdated',
     id: 'last',
-    document: msg
-    });}
+    document: {'last_updated': lastUpdated}
+    });
+
   
 })
   .catch((err) => {
@@ -99,35 +107,24 @@ wss.on('connection', async (ws) => {
     index: 'lastmsg',
     id: 'last'
   }).then((res) => {
-    console.log(res);
     var m=res._source;
   if (m.urgency>=4){
     m = `Type: ${m.eventType}, Source: ${m.eventSource}, Urgency: ${m.urgency}`;
-    console.log(m);
     const blinkingMessageInterval = setInterval(() => {
       const message = { text: m, blinking: true };
       ws.send(JSON.stringify(message));
     }, 1000);
   }
-    //ws.send(JSON.stringify(res.body._source));
   });
   
   });
-// wss.on('connection', async (ws) => {
-//   console.log('Client connected.');
-//   await redis_client.connect();
-//   const msg = await (redis_client.get("Urgent event"));
-//   await redis_client.quit();
-//   var m;
-//   if (msg != null){
-//     const m2 = JSON.parse(msg);
-//     m = `Urgency level: ${msg.urgency}, event type: ${m2.eventType}, source: ${m2.eventSource}`;
-//     const blinkingMessageInterval = setInterval(() => {
-//       const message = { text: m, blinking: true };
-//       ws.send(JSON.stringify(message));
-//     }, 1000);
-//   }
-//   // Send blinking messages to the client
-//   // sendBlinkingMessage(ws, 'This is a blinking message!', 500);
-// });
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}/${month}/${day}:${hours}:${minutes}`;
+  }
+
 

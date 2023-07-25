@@ -3,7 +3,7 @@ const path = require('path');
 const app = express();
 const ejs = require('ejs'); 
 const bodyParser = require('body-parser');
-const sun_info = require('./sun_info');
+const sun_info = require('./servers/sun_info_server');
 const fs = require('fs');
 const API_KEY = '4bVmf61GGj3Fa8SPtSG2zPEeQTPgFxdnBaYRKazF';
 const currentDate = new Date();
@@ -13,8 +13,8 @@ const month = String(nextDate.getMonth() + 1).padStart(2, '0');
 const day = String(nextDate.getDate()).padStart(2, '0');
 const formattedDate = `${year}-${month}-${day}`;
 const axios = require('axios');
-const connect_and_publish = require('./redis_data');
-const es = require('./dashboards');
+const connect_and_publish = require('./models/nasa_data');
+const es = require('./models/es_functions');
 
 
 // Define the path to the views folder
@@ -41,6 +41,7 @@ app.get('/sun_info', (req, res) => {
 app.get('/', async (req, res) => {
     var urgencies = {'1':0,'2':0,'3':0,'4':0,'5':0};
     var events ={'GRB':0,'ABR':0,'UVR':0,'XRR':0,'CMT':0}
+    const last_updated = await es.last_updated();
     dateObj = new Date();
     dateObj.setDate(dateObj.getDate() - 7);
     dateObj.setHours(0, 0, 0, 0);
@@ -99,7 +100,7 @@ app.get('/', async (req, res) => {
       const events_txt = 'Total Events: '+total_events.toString();
       //const data3Labels = Object.keys(hours);
     const filePath = path.join(viewsFolder, 'dashboard.ejs');
-    res.render(filePath, { data1Values, data2Values, data3Values, data2Labels, urg_txt, events_txt ,last_event });
+    res.render(filePath, { data1Values, data2Values, data3Values, data2Labels, urg_txt, events_txt ,last_event,last_updated });
     //res.sendFile(filePath);
   });
   app.get('/neotable', async (req, res) => {
@@ -113,7 +114,7 @@ app.get('/', async (req, res) => {
       const sizes = await connect_and_publish.get_neo_graph_data();
       const labels = Object.keys(sizes).map(Number); // Array of x-axis labels
       const dataPoints = Object.values(sizes); // Array of y-axis data points
-      const xAxisLabel = 'Maximum Estimated Diameter Meters'; // Customize the x-axis label
+      const xAxisLabel = 'Maximum Estimated Diameter (Meters)'; // Customize the x-axis label
       const yAxisLabel = 'Quantity Of Asteroids'; // Customize the y-axis label
       const chartLabel = 'Distribution Of Near Earth Object In The Past Month By Diameter'; // The label for the chart
       // Read the EJS template file
@@ -147,7 +148,7 @@ app.get('/', async (req, res) => {
   
   // Route to handle search form submission
   app.post('/search_table_post', async (req, res) => {
-      const { startDate, endDate, event_type,telescope } = req.body;
+      const { startDate, endDate, event,telescope } = req.body;
       var dateObj;
       if(!startDate){
         dateObj = new Date();
@@ -155,7 +156,7 @@ app.get('/', async (req, res) => {
       }else{
         dateObj = new Date(startDate);
       }
-      dateObj.setHours(0, 0, 0, 0);
+      dateObj.setUTCHours(0, 0, 0, 0);
       const format_startDate = dateObj.toISOString();
       var dateObj2;
       if(!endDate){
@@ -163,16 +164,16 @@ app.get('/', async (req, res) => {
       }else{
         dateObj2 = new Date(endDate);
       }
-      dateObj2.setHours(23, 59, 0, 0);
+      dateObj2.setUTCHours(23, 59, 0, 0);
       const format_endDate = dateObj2.toISOString();
       var query={};
-      if (event_type){query['eventType']=event_type;}
+      if (event){query['eventType']=event;}
       if (telescope){query['eventSource']=telescope;}
-      
       const result = await es.read_within_dates(format_startDate, format_endDate,query);
       res.render('temp', { entries: result });
       
   });
+  
 // Start the server
 const port = 3000;
 app.listen(port, () => {

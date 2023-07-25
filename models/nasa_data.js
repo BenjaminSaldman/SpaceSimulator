@@ -1,10 +1,4 @@
 const axios = require('axios');
-const { createCanvas } = require('canvas');
-const Chart = require('chart.js');
-const express = require('express');
-const ejs = require('ejs');
-const fs = require('fs');
-const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
 const currentDate = new Date();
 const oneMonthAgo = new Date();
 const threWeeksAgo = new Date();
@@ -32,7 +26,6 @@ async function callAsteroidAPI() {
         .then(response => {
         // Process the response data and create the graph
         const asteroidData = response.data;
-        //console.log(createAsteroidGraph(asteroidData));
         createAsteroidGraph(asteroidData).then((res) => {
             for (const key in res) {
                 sizeCount[key] += res[key];
@@ -87,12 +80,10 @@ function formatDate(date) {
     return sizeCount;
   }
 
-
-const app = express();
-const port = 3000;
 const redis = require('redis');
+
 const client = redis.createClient('redis://localhost:6379');
-async function connect_and_publish(){
+async function get_neo_graph_data(){
     var ret = {};
     await client.connect();
     await client.get('last updated neo').then(async (reply, err) => {
@@ -101,11 +92,15 @@ async function connect_and_publish(){
         } else {
             rep = JSON.parse(reply);
             if (rep == null || (rep!=null && rep['last_updated'] != formatDate(currentDate))){
+                client.quit();
                 await callAsteroidAPI().then(async (res) => {
                     const data = {
                         'last_updated': formatDate(currentDate),
                         'data': sizeCount
                     };
+                  if (!client.connected){
+                    await client.connect();
+                  }
                     await client.set('last updated neo', JSON.stringify(data)).then(() => { 
                         console.log('Redis set success');
                         ret = sizeCount;
@@ -125,47 +120,70 @@ async function connect_and_publish(){
       return ret;
 
 }
-app.get('/', async (req, res) => {
-  try {
-    // Generate the Chart.js graph and get the chart image buffer
-    //await callAsteroidAPI();
-    
-    const sizes = await connect_and_publish();
-    const labels = Object.keys(sizes).map(Number); // Array of x-axis labels
-    const dataPoints = Object.values(sizes); // Array of y-axis data points
-    const xAxisLabel = 'Maximum Estimated Diameter Meters'; // Customize the x-axis label
-    const yAxisLabel = 'Quantity Of Asteroids'; // Customize the y-axis label
-    const chartLabel = 'Distribution Of Near Earth Object In The Past Month By Diameter'; // The label for the chart
-    // Read the EJS template file
-    fs.readFile('chart.ejs', 'utf8', (err, template) => {
-      if (err) {
-        console.error('Error reading template file:', err);
-        res.status(500).send('Internal Server Error');
-        return;
-      }
+async function get_neo_data(){
+    var ret = [];
+    const currentDate = new Date();
+    const nextDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000); // Add 24 hours to the current date
+    const year = nextDate.getFullYear();
+    const month = String(nextDate.getMonth() + 1).padStart(2, '0');
+    const day = String(nextDate.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    await client.connect();
+    await client.get('last updated table').then(async (reply, err) => {
+        if (err) {
+            console.log('Redis get error:', err);
+        } else {
+            rep = JSON.parse(reply);
+            if (rep == null || (rep!=null && rep['last_updated'] != formatDate(currentDate))){
+            client.quit();
+            await axios.get(`https://api.nasa.gov/neo/rest/v1/feed?start_date=${formattedDate}&api_key=${API_KEY}`).then(async response => {                                               
+            const nearEarthObjects = response.data.near_earth_objects;
+            const neoData = [];
+            // Loop through the near Earth objects and filter out the ones for the next 24 hours
+            Object.entries(nearEarthObjects).forEach(([date, asteroids]) => {
+            if (new Date(date) <= nextDate) {
+                asteroids.forEach(asteroid => {
+                const estimatedDiameterMin = asteroid.estimated_diameter.kilometers.estimated_diameter_min;
+                const estimatedDiameterMax = asteroid.estimated_diameter.kilometers.estimated_diameter_max;
+                const name = asteroid.name;
+                const closeApproachDate = asteroid.close_approach_data[0].close_approach_date_full;
+                const isPotentiallyHazardous = asteroid.is_potentially_hazardous_asteroid;
+                neoData.push({ name, estimatedDiameter: { min: estimatedDiameterMin, max: estimatedDiameterMax }, closeApproachDate,isPotentiallyHazardous });
+            });
+          }
+        });
+        ret = neoData;
+        const data = {
+            'last_updated': formatDate(currentDate),
+            'data': neoData
+        };
+        if (!client.connected){
+          await client.connect();
+        }
+        await client.set('last updated table', JSON.stringify(data)).then(() => { 
+            console.log('Redis set success');
+        }
+        );
 
-      // Render the EJS template with data
-      const renderedChart = ejs.render(template, {
-        labels,
-        dataPoints,
-        xAxisLabel,
-        yAxisLabel,
-        chartLabel,
-      });
+        }).catch(error => {
+            console.error('Error:', error);
+            res.status(500).json({ error: 'An error occurred while fetching data from NASA API' });
+        });
 
-      // Serve the rendered chart as an HTML response
-      res.set('Content-Type', 'text/html');
-      res.send(renderedChart);
-    });
-  } catch (error) {
-    console.error('Error generating chart:', error);
-    res.status(500).send('Internal Server Error');
-  }
+        }
+        else{
+          
+            if (rep['last_updated'] == formatDate(currentDate)){
+                console.log('Redis get success');
+                ret = rep['data'];
+            }
+            
+        }
+    }
+
 });
+client.quit();
+return ret;
+}
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
-
-
+module.exports = { get_neo_graph_data, get_neo_data }

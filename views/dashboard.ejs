@@ -77,10 +77,20 @@
         color: #333;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
       }
+      .last-update {
+      position: absolute;
+      top: 55px;
+      right: 200px;
+      font-size: 14px;
+      color: #666;
+    }
   </style>
 </head>
 <body>
   <h1>Nasa Project Dashboard</h1>
+  <div class="last-update">Last Updated: <span id="lastUpdateDate"></span>
+
+  </div>
 
     <ul class="other-pages">
       <li>
@@ -136,20 +146,21 @@
       <div id="message-container"></div>
       <canvas id="l4" width="300" height="150"></canvas>
     </div>
+    
   </div>
   <div class="card-container">
     <div class="card">
-      <h3>Graph 1: Bar Chart</h3>
+      <h3>Number Of Events From Each Type In The Last Week</h3>
       <canvas id="barChart" width="300" height="150"></canvas>
     </div>
 
     <div class="card">
-      <h3>Graph 2: Line Chart</h3>
+      <h3>Number Of Events Today In Every Hour</h3>
       <canvas id="lineChart" width="300" height="150"></canvas>
     </div>
 
     <div class="card">
-      <h3>Graph 3: Pie Chart</h3>
+      <h3>Number Of Events For Each Urgency Level</h3>
       <canvas id="pieChart" width="300" height="150"></canvas>
     </div>
   </div>
@@ -188,7 +199,7 @@
       const data1 = {
         labels: ['GRB', 'ABR', 'UVR', 'XRR', 'CMT'],
         datasets: [{
-          label: 'Data 1',
+          label: 'Events',
           data: data1Values,
           backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(54, 99, 132, 0.6)'],
           borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(132, 99, 132, 1)'],
@@ -200,7 +211,7 @@
       const data2 = {
         labels: data2Labels,
         datasets: [{
-          label: 'Data 2',
+          label: 'Number Of Events',
           data: data2Values,
           borderColor: 'rgba(75, 192, 192, 1)',
           fill: false
@@ -268,6 +279,13 @@
       ctxL3.font = '20px Arial';
       ctxL3.fillText(last_event_str, 15, 20); // Adjust the position of the string as needed
       ctxL3.stroke();
+
+      const last_update = document.getElementById('lastUpdateDate');
+      const last_update_str = JSON.parse('<%- JSON.stringify(last_updated) %>');
+      console.log(last_update_str['last_updated']);
+      last_update.textContent = last_update_str['last_updated'];
+
+
     }
 
     // Call the function to update the chart data and canvas with dynamic string initially

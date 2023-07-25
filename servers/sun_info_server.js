@@ -76,12 +76,7 @@ async function update_images(){
   }
 }
 update_images();
-// getSunInfo('https://www.spaceweatherlive.com/images/SDO/latest_512_0193.jpg','coronal_holes.jpg').then(() => {});
-// getSunInfo('https://www.spaceweatherlive.com/images/SDO/SDO_HMIIF_512.jpg','sunspot_regions.jpg').then(() => {});
-// getSunInfo('https://sohowww.nascom.nasa.gov/data/realtime/c2/512/latest.jpg','coronal_mass_ejections.jpg').then(() => {});
-// getSunInfo('https://www.spaceweatherlive.com/images/SDO/latest_512_0131.jpg','solar_flares.jpg').then(() => {});
-// getSunInfo('https://stereo-ssc.nascom.nasa.gov/beacon/euvi_195_heliographic.gif','far_side.jpg').then(() => {});
-//read_info().then(() => {});
+
 
 
 module.exports = sun_info;
