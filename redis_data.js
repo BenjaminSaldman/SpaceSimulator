@@ -81,6 +81,7 @@ function formatDate(date) {
   }
 
 const redis = require('redis');
+
 const client = redis.createClient('redis://localhost:6379');
 async function get_neo_graph_data(){
     var ret = {};
@@ -91,11 +92,15 @@ async function get_neo_graph_data(){
         } else {
             rep = JSON.parse(reply);
             if (rep == null || (rep!=null && rep['last_updated'] != formatDate(currentDate))){
+                client.quit();
                 await callAsteroidAPI().then(async (res) => {
                     const data = {
                         'last_updated': formatDate(currentDate),
                         'data': sizeCount
                     };
+                  if (!client.connected){
+                    await client.connect();
+                  }
                     await client.set('last updated neo', JSON.stringify(data)).then(() => { 
                         console.log('Redis set success');
                         ret = sizeCount;
@@ -130,6 +135,7 @@ async function get_neo_data(){
         } else {
             rep = JSON.parse(reply);
             if (rep == null || (rep!=null && rep['last_updated'] != formatDate(currentDate))){
+            client.quit();
             await axios.get(`https://api.nasa.gov/neo/rest/v1/feed?start_date=${formattedDate}&api_key=${API_KEY}`).then(async response => {                                               
             const nearEarthObjects = response.data.near_earth_objects;
             const neoData = [];
@@ -151,6 +157,9 @@ async function get_neo_data(){
             'last_updated': formatDate(currentDate),
             'data': neoData
         };
+        if (!client.connected){
+          await client.connect();
+        }
         await client.set('last updated table', JSON.stringify(data)).then(() => { 
             console.log('Redis set success');
         }

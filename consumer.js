@@ -81,11 +81,12 @@ consumer("events",async ({key,value}) => {
     id: msg.eventTS,
     document: msg
     });
+    if (msg.urgency>=4){
   client.index({
     index: 'lastmsg',
     id: 'last',
     document: msg
-    });
+    });}
   
 })
   .catch((err) => {
