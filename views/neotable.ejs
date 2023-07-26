@@ -18,39 +18,43 @@
       padding: 8px;
       vertical-align: middle;
     }
+
     h1 {
-        font-size: 36px;
-        text-align: center;
-        margin-top: 50px;
-        color: #333;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-      }
+      font-size: 36px;
+      text-align: center;
+      margin-top: 50px;
+      color: #333;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
     th {
-      background-color: #FFDAB9; 
+      background-color: #FFDAB9;
       font-weight: bold;
     }
-    td{
-      background-color: #FFF8DC; 
+
+    td {
+      background-color: #FFF8DC;
     }
+
     .other-pages {
-        text-align: center;
-        margin-bottom: 20px;
-      }
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-      .other-pages li {
-        list-style: none;
-        display: inline-block;
-        margin-right: 10px;
-      }
+    .other-pages li {
+      list-style: none;
+      display: inline-block;
+      margin-right: 10px;
+    }
 
-      .other-pages a {
-        text-decoration: none;
-        color: #333;
-      }
+    .other-pages a {
+      text-decoration: none;
+      color: #333;
+    }
 
-      .other-pages i {
-        margin-right: 5px;
-      }
+    .other-pages i {
+      margin-right: 5px;
+    }
   </style>
 </head>
 <body>
@@ -97,17 +101,47 @@
         <th>Is Potentially Hazardous</th>
       </tr>
     </thead>
-    <tbody>
-      <% neoData.forEach(neoObject => { %>
-        <tr>
-          <td><%= neoObject.name %></td>
-          <td><%= neoObject.estimatedDiameter.min %> km</td>
-          <td><%= neoObject.estimatedDiameter.max %> km</td>
-          <td><%= neoObject.closeApproachDate %></td>
-          <td><%= neoObject.isPotentiallyHazardous %></td>
-        </tr>
-      <% }) %>
+    <tbody id="neoTable">
     </tbody>
   </table>
+
+  <script>
+    // Function to generate table rows dynamically
+    const socket = new WebSocket('ws://localhost:8062');
+    socket.addEventListener('message', function (event) {
+      const neoData = JSON.parse(event.data);
+      generateTableRows(neoData);
+    });
+    function generateTableRows(neoData) {
+      const tbody = document.getElementById("neoTable");
+
+      neoData.forEach(neoObject => {
+        const row = document.createElement("tr");
+
+        const nameCell = document.createElement("td");
+        nameCell.textContent = neoObject.name;
+        row.appendChild(nameCell);
+
+        const minDiameterCell = document.createElement("td");
+        minDiameterCell.textContent = neoObject.estimatedDiameter.min + " km";
+        row.appendChild(minDiameterCell);
+
+        const maxDiameterCell = document.createElement("td");
+        maxDiameterCell.textContent = neoObject.estimatedDiameter.max + " km";
+        row.appendChild(maxDiameterCell);
+
+        const approachDateCell = document.createElement("td");
+        approachDateCell.textContent = neoObject.closeApproachDate;
+        row.appendChild(approachDateCell);
+
+        const hazardousCell = document.createElement("td");
+        hazardousCell.textContent = neoObject.isPotentiallyHazardous;
+        row.appendChild(hazardousCell);
+
+        tbody.appendChild(row);
+      });
+    }
+
+  </script>
 </body>
 </html>

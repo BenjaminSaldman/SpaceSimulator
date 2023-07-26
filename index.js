@@ -40,7 +40,8 @@ app.get('/', async (req, res) => {
   });
   app.get('/neotable', async (req, res) => {
     const neoData = await connect_and_publish.get_neo_data();
-    res.render('neotable', { neoData }); // Render the EJS template with the NEO data
+    res.render('neotable'); // Render the EJS template with the NEO data
+    //res.render('neotable', { neoData }); // Render the EJS template with the NEO data
   });
   app.get('/nasa_graph', async (req, res) => {
     const filePath = path.join(viewsFolder, 'neo_graph.ejs');
@@ -85,7 +86,12 @@ app.listen(port, () => {
 });
 const dashboard_socket = new WebSocket.Server({ port: 8060 });
 const neo_graph_socket = new WebSocket.Server({ port: 8061 });
+const neo_table_socket = new WebSocket.Server({ port: 8062 });
 
+neo_table_socket.on('connection', async (ws) => {
+  const neoData = await connect_and_publish.get_neo_data();
+  ws.send(JSON.stringify(neoData));
+});
 neo_graph_socket.on('connection', async (ws) => {
   const sizes = await connect_and_publish.get_neo_graph_data();
       const labels = Object.keys(sizes).map(Number); // Array of x-axis labels
