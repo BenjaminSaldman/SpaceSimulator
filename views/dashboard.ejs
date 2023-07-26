@@ -135,11 +135,11 @@
       <h3 style="display: flex; margin-left: 100px; margin-top: -35px;">Summary</h3>
       <canvas id="l2" width="300" height="150"></canvas>
     </div>
-    <div class="card-upper">
+    <!-- <div class="card-upper">
       <img src="images/last_event.png" alt="Last Event" width="50" height="50">
       <h3 style="display: flex; margin-left: 100px; margin-top: -35px;">Last Event</h3>
       <canvas id="l3" width="300" height="150"></canvas>
-    </div>
+    </div> -->
     <div class="card-upper">
       <img src="images/alertAstroid.png" alt="New Critical Event" width="50" height="50">
       <h3 style="display: flex; margin-left: 100px; margin-top: -35px;">New Critical Event</h3>
@@ -163,13 +163,25 @@
       <h3>Number Of Events For Each Urgency Level</h3>
       <canvas id="pieChart" width="300" height="150"></canvas>
     </div>
+    <div class="card">
+      <img src="images/last_event.png" alt="Last Event" width="50" height="50">
+      <h3 style="display: flex; margin-left: 100px; margin-top: -35px;">Last Event</h3>
+      <!-- <canvas id="l3" width="300" height="150"></canvas> -->
+      <div id='N'></div>
+    </div>
   </div>
 
   <script>
       const socket = new WebSocket('ws://localhost:8080');
+   
       socket.addEventListener('message', (event) => {
       const message = JSON.parse(event.data);
       displayMessage(message);
+    });
+    const socket_events = new WebSocket('ws://localhost:8060');
+    socket_events.addEventListener('message', (event) => {
+      const message = JSON.parse(event.data);
+      updateChartData(message);
     });
       function displayMessage(message) {
       const messageContainer = document.getElementById('message-container');
@@ -185,22 +197,23 @@
       }
 
     // Function to update the chart data and canvas with dynamic string
-    function updateChartData() {
+   
+
+    // Call the function to update the chart data and canvas with dynamic string initially
+    //updateChartData();
+    function updateChartData(message) {
       // Sample data for the charts
-      //   const data1Values = <%= JSON.stringify(data1Values) %>;
-      //   const data2Values = <%= JSON.stringify(data2Values) %>;
-      //   const data3Values = <%= JSON.stringify(data3Values) %>;
-      const data1Values = JSON.parse('<%- JSON.stringify(data1Values) %>');
-      const data2Values = JSON.parse('<%- JSON.stringify(data2Values) %>');
-      const data2Labels = JSON.parse('<%- JSON.stringify(data2Labels) %>');
-      const data3Values = JSON.parse('<%- JSON.stringify(data3Values) %>');
+      const last_week_events = message.last_week_events;
+      const total_events_per_hour = message.total_events_per_hour;
+      const total_events_per_hour_labels = message.total_events_per_hour_labels;
+      const last_week_urgencies = message.last_week_urgencies;
 
       // Update data for Chart 1
       const data1 = {
         labels: ['GRB', 'ABR', 'UVR', 'XRR', 'CMT'],
         datasets: [{
           label: 'Events',
-          data: data1Values,
+          data: last_week_events,
           backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(54, 99, 132, 0.6)'],
           borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(132, 99, 132, 1)'],
           borderWidth: 1
@@ -209,10 +222,10 @@
 
       // Update data for Chart 2
       const data2 = {
-        labels: data2Labels,
+        labels: total_events_per_hour_labels,
         datasets: [{
           label: 'Number Of Events',
-          data: data2Values,
+          data: total_events_per_hour,
           borderColor: 'rgba(75, 192, 192, 1)',
           fill: false
         }]
@@ -222,7 +235,7 @@
       const data3 = {
         labels: [1, 2, 3, 4, 5],
         datasets: [{
-          data: data3Values,
+          data: last_week_urgencies,
           backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(54, 99, 132, 0.6)'],
           hoverBackgroundColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(132, 99, 132, 1)']
         }]
@@ -254,7 +267,7 @@
       });
 
       // Dynamic string received from the router (replace this with your actual value)
-      const urgencies_str = JSON.parse('<%- JSON.stringify(urg_txt) %>');
+      const urgencies_str = message.urg_txt;
 
       // Update the canvas labeled "l1" with the dynamic string and image
       const canvasL1 = document.getElementById('l1');
@@ -265,31 +278,29 @@
       ctxL1.stroke();
 
       const canvasL2 = document.getElementById('l2');
-      const events_str = JSON.parse('<%- JSON.stringify(events_txt) %>');
+      const events_str = message.events_txt;
       const ctxL2 = canvasL2.getContext('2d');
       ctxL2.clearRect(0, 0, canvasL2.width, canvasL2.height); // Clear the canvas before updating
       ctxL2.font = '20px Arial';
       ctxL2.fillText(events_str, 15, 20); // Adjust the position of the string as needed
       ctxL2.stroke();
 
-      const canvasL3 = document.getElementById('l3');
-      const last_event_str = JSON.parse('<%- JSON.stringify(last_event) %>');
-      const ctxL3 = canvasL3.getContext('2d');
-      ctxL3.clearRect(0, 0, canvasL3.width, canvasL3.height); // Clear the canvas before updating
-      ctxL3.font = '20px Arial';
-      ctxL3.fillText(last_event_str, 15, 20); // Adjust the position of the string as needed
-      ctxL3.stroke();
-
+      // const canvasL3 = document.getElementById('l3');
+      // const last_event_str = message.last_event;
+      // const ctxL3 = canvasL3.getContext('2d');
+      // ctxL3.clearRect(0, 0, canvasL3.width, canvasL3.height); // Clear the canvas before updating
+      // ctxL3.font = '20px Arial';
+      // ctxL3.fillText(last_event_str, 15, 20); // Adjust the position of the string as needed
+      // ctxL3.stroke();
+      const canvasL4 = document.getElementById('N');
+      canvasL4.whiteSpace = 'pre-wrap';
+      const modifiedText = message.last_event+'\n ka'.replace(/\n/g, '<br>');
+      canvasL4.innerHTML = message.last_event;
+      //canvasL4='akak';
       const last_update = document.getElementById('lastUpdateDate');
-      const last_update_str = JSON.parse('<%- JSON.stringify(last_updated) %>');
-      console.log(last_update_str['last_updated']);
+      const last_update_str = message.last_updated;
       last_update.textContent = last_update_str['last_updated'];
-
-
-    }
-
-    // Call the function to update the chart data and canvas with dynamic string initially
-    updateChartData();
+      }
   </script>
 </body>
 </html>

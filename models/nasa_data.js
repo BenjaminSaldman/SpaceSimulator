@@ -124,9 +124,9 @@ async function get_neo_data(){
     var ret = [];
     const currentDate = new Date();
     const nextDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000); // Add 24 hours to the current date
-    const year = nextDate.getFullYear();
-    const month = String(nextDate.getMonth() + 1).padStart(2, '0');
-    const day = String(nextDate.getDate()).padStart(2, '0');
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
     await client.connect();
     await client.get('last updated table').then(async (reply, err) => {
@@ -147,8 +147,28 @@ async function get_neo_data(){
                 const estimatedDiameterMax = asteroid.estimated_diameter.kilometers.estimated_diameter_max;
                 const name = asteroid.name;
                 const closeApproachDate = asteroid.close_approach_data[0].close_approach_date_full;
+                var valid = false;
+                if (new Date(closeApproachDate).getHours()<currentDate.getHours())
+                {
+                  valid = true;
+                }
+                else if (new Date(closeApproachDate).getHours()<=currentDate.getHours())
+                {
+                 if (new Date(closeApproachDate).getMinutes() <= currentDate.getMinutes()){
+                    valid = true;
+                  }else{
+                    valid = false;
+                  }
+                }
                 const isPotentiallyHazardous = asteroid.is_potentially_hazardous_asteroid;
-                neoData.push({ name, estimatedDiameter: { min: estimatedDiameterMin, max: estimatedDiameterMax }, closeApproachDate,isPotentiallyHazardous });
+                if (new Date(closeApproachDate).getDate()>currentDate.getDate()) {
+                  if (valid){
+                    neoData.push({ name, estimatedDiameter: { min: estimatedDiameterMin, max: estimatedDiameterMax }, closeApproachDate,isPotentiallyHazardous });
+                  }
+                }else if ((new Date(closeApproachDate).getHours() == currentDate.getHours() && new Date(closeApproachDate).getMinutes() >= currentDate.getMinutes() || new Date(closeApproachDate).getHours() > currentDate.getHours())){
+                  neoData.push({ name, estimatedDiameter: { min: estimatedDiameterMin, max: estimatedDiameterMax }, closeApproachDate,isPotentiallyHazardous });
+                }
+                
             });
           }
         });

@@ -101,14 +101,14 @@ consumer("events",async ({key,value}) => {
     console.error(`Something went wrong:\n${err}`);
     process.exit(1);
   });
-const wss = new WebSocket.Server({ port: 8080 });
-wss.on('connection', async (ws) => {
+const web_socket = new WebSocket.Server({ port: 8080 });
+web_socket.on('connection', async (ws) => {
   client.get({
     index: 'lastmsg',
     id: 'last'
   }).then((res) => {
     var m=res._source;
-  if (m.urgency>=4){
+  if (m.urgency>=4 && (new Date().getDay() == new Date(m.eventTS).getDay() && new Date().getMonth() == new Date(m.eventTS).getMonth() && new Date().getFullYear() == new Date(m.eventTS).getFullYear())){
     m = `Type: ${m.eventType}, Source: ${m.eventSource}, Urgency: ${m.urgency}`;
     const blinkingMessageInterval = setInterval(() => {
       const message = { text: m, blinking: true };
@@ -116,7 +116,8 @@ wss.on('connection', async (ws) => {
     }, 1000);
   }
   });
-  
+
+
   });
   function formatDate(date) {
     const year = date.getFullYear();

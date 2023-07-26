@@ -87,12 +87,17 @@
   <canvas id="myChart"></canvas>
   <script>
     const ctx = document.getElementById('myChart').getContext('2d');
-
-    const labels = JSON.parse('<%- JSON.stringify(labels) %>');
-    const dataPoints = JSON.parse('<%- JSON.stringify(dataPoints) %>');
-    const xAxisLabel = '<%= xAxisLabel %>';
-    const yAxisLabel = '<%= yAxisLabel %>';
-    const chartLabel = '<%= chartLabel %>';
+    const socket = new WebSocket('ws://localhost:8061');
+    socket.addEventListener('message', (event) => {
+      const message = JSON.parse(event.data);
+      updateGraph(message);
+    });
+  function updateGraph(message){
+    const labels =message.labels;
+    const dataPoints = message.dataPoints;
+    const xAxisLabel = message.xAxisLabel;
+    const yAxisLabel = message.yAxisLabel;
+    const chartLabel = message.chartLabel;
 
     const data = {
       labels: labels,
@@ -136,6 +141,7 @@
     };
 
     new Chart(ctx, config);
+  }
   </script>
 </body>
 </html>
