@@ -2,10 +2,10 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Graph Chart</title>
+  <title>NEO Graph</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-
+  <link rel="icon" type="image/png" href="/images/asteroid.png">
   <style>
     /* Center the canvas element */
     body, html {
@@ -87,11 +87,14 @@
   <canvas id="myChart"></canvas>
   <script>
     const ctx = document.getElementById('myChart').getContext('2d');
-    const socket = new WebSocket('ws://localhost:8061');
+    const socket = new WebSocket('ws://localhost:8061'); // Socket to update the graph.
     socket.addEventListener('message', (event) => {
       const message = JSON.parse(event.data);
       updateGraph(message);
     });
+    /**
+     * Update the graph with the new data.
+     */
   function updateGraph(message){
     const labels =message.labels;
     const dataPoints = message.dataPoints;
@@ -104,19 +107,19 @@
       datasets: [{
         label: chartLabel,
         data: dataPoints,
-        backgroundColor: 'rgba(0, 120, 200, 0.5)', // Set the color for bars
-        borderWidth: 1, // Set the border width for bars
+        backgroundColor: 'rgba(0, 120, 200, 0.5)', 
+        borderWidth: 1, 
       }]
     };
 
     const config = {
-      type: 'bar', // Change chart type to 'bar'
+      type: 'bar', 
       data: data,
       options: {
         responsive: false,
         scales: {
           x: {
-            type: 'category', // Use category scale for the x-axis
+            type: 'category', 
             title: {
               display: true,
               text: xAxisLabel,

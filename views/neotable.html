@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEO Table</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="icon" type="image/png" href="/images/asteroid.png">
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: middle;
+      padding: 8px;
+      vertical-align: middle;
+    }
+
+    h1 {
+      font-size: 36px;
+      text-align: center;
+      margin-top: 50px;
+      color: #333;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    th {
+      background-color: #FFDAB9;
+      font-weight: bold;
+    }
+
+    td {
+      background-color: #FFF8DC;
+    }
+
+    .other-pages {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .other-pages li {
+      list-style: none;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .other-pages a {
+      text-decoration: none;
+      color: #333;
+    }
+
+    .other-pages i {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Near-Earth Objects in the Next 24 Hours</h1>
+  <ul class="other-pages">
+    <li>
+      <a href="/">
+        <i class="fas fa-chart-bar"></i>
+        Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="/nasa_graph">
+        <i class="fas fa-satellite"></i>
+        NASA Objects Graph
+      </a>
+    </li>
+    <li>
+      <a href="/neotable">
+        <i class="fas fa-satellite"></i>
+        NASA Objects Table
+      </a>
+    </li>
+    <li>
+      <a href="/sun_info">
+        <i class="fas fa-sun"></i>
+        Sun Info
+      </a>
+    </li>
+    <li>
+      <a href="/search_table">
+        <i class="fas fa-search"></i>
+        Search Table
+      </a>
+    </li>
+  </ul>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Estimated Diameter (km) - Min</th>
+        <th>Estimated Diameter (km) - Max</th>
+        <th>Close Approach Date</th>
+        <th>Is Potentially Hazardous</th>
+      </tr>
+    </thead>
+    <tbody id="neoTable">
+    </tbody>
+  </table>
+
+  <script>
+    const socket = new WebSocket('ws://localhost:8062'); // Socket to update the table.
+    socket.addEventListener('message', function (event) {
+      const neoData = JSON.parse(event.data);
+      generateTableRows(neoData);
+    });
+    /**
+     * Generates table rows for the NEO table.
+     * @param {Array} neoData - Array of NEO objects.
+     */
+    function generateTableRows(neoData) {
+      const tbody = document.getElementById("neoTable");
+
+      neoData.forEach(neoObject => {
+        const row = document.createElement("tr");
+
+        const nameCell = document.createElement("td");
+        nameCell.textContent = neoObject.name;
+        row.appendChild(nameCell);
+
+        const minDiameterCell = document.createElement("td");
+        minDiameterCell.textContent = neoObject.estimatedDiameter.min + " km";
+        row.appendChild(minDiameterCell);
+
+        const maxDiameterCell = document.createElement("td");
+        maxDiameterCell.textContent = neoObject.estimatedDiameter.max + " km";
+        row.appendChild(maxDiameterCell);
+
+        const approachDateCell = document.createElement("td");
+        approachDateCell.textContent = neoObject.closeApproachDate;
+        row.appendChild(approachDateCell);
+
+        const hazardousCell = document.createElement("td");
+        hazardousCell.textContent = neoObject.isPotentiallyHazardous;
+        row.appendChild(hazardousCell);
+
+        tbody.appendChild(row);
+      });
+    }
+
+  </script>
+</body>
+</html>

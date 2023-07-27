@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Graphs with Cards</title>
+  <title>Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="icon" type="image/png" href="/images/spaceship.png">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -42,6 +43,14 @@
       width: 300px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+    .card-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+        text-align: center;
+
+      }
     .blinking {
       animation: blink 1s infinite;
     }
@@ -128,18 +137,15 @@
     <div class="card-upper">
       <img src="images/alert.png" alt="Alert" width="50" height="50">
       <h3 style="display: flex; margin-left: 100px; margin-top: -35px;">Critical Events</h3>
+      <div id="critical_events"></div>
       <canvas id="l1" width="300" height="150"></canvas>
     </div>
     <div class="card-upper">
       <img src="images/total.jpg" alt="Total Events" width="50" height="50">
       <h3 style="display: flex; margin-left: 100px; margin-top: -35px;">Summary</h3>
+      <div id="total_events"></div>
       <canvas id="l2" width="300" height="150"></canvas>
     </div>
-    <!-- <div class="card-upper">
-      <img src="images/last_event.png" alt="Last Event" width="50" height="50">
-      <h3 style="display: flex; margin-left: 100px; margin-top: -35px;">Last Event</h3>
-      <canvas id="l3" width="300" height="150"></canvas>
-    </div> -->
     <div class="card-upper">
       <img src="images/alertAstroid.png" alt="New Critical Event" width="50" height="50">
       <h3 style="display: flex; margin-left: 100px; margin-top: -35px;">New Critical Event</h3>
@@ -150,35 +156,34 @@
   </div>
   <div class="card-container">
     <div class="card">
-      <h3>Number Of Events From Each Type In The Last Week</h3>
+      <div class="card-title">Number Of Events From Each Type In The Last Week</div>
       <canvas id="barChart" width="300" height="150"></canvas>
     </div>
 
     <div class="card">
-      <h3>Number Of Events Today In Every Hour</h3>
+      <div class="card-title">Number Of Events In The Last 24 Hours In Every Hour</div>
       <canvas id="lineChart" width="300" height="150"></canvas>
     </div>
 
     <div class="card">
-      <h3>Number Of Events For Each Urgency Level</h3>
+      <div class="card-title">Number Of Events For Each Urgency Level</div>
       <canvas id="pieChart" width="300" height="150"></canvas>
     </div>
     <div class="card">
       <img src="images/last_event.png" alt="Last Event" width="50" height="50">
-      <h3 style="display: flex; margin-left: 100px; margin-top: -35px;">Last Event</h3>
-      <!-- <canvas id="l3" width="300" height="150"></canvas> -->
-      <div id='N'></div>
+      <h3 style="display: flex; margin-left: 100px; margin-top: -35px;font-size: 20px;">Last Event</h3>
+      <div id='last_msg'></div>
     </div>
   </div>
 
   <script>
-      const socket = new WebSocket('ws://localhost:8080');
+      const socket = new WebSocket('ws://localhost:8080'); // Connect to the websocket for the blinking message.
    
       socket.addEventListener('message', (event) => {
       const message = JSON.parse(event.data);
       displayMessage(message);
     });
-    const socket_events = new WebSocket('ws://localhost:8060');
+    const socket_events = new WebSocket('ws://localhost:8060'); // Connect to the websocket for the charts.
     socket_events.addEventListener('message', (event) => {
       const message = JSON.parse(event.data);
       updateChartData(message);
@@ -196,13 +201,10 @@
       }
       }
 
-    // Function to update the chart data and canvas with dynamic string
-   
-
-    // Call the function to update the chart data and canvas with dynamic string initially
-    //updateChartData();
+      /**
+       * Update the charts with the data received from the server.
+       */
     function updateChartData(message) {
-      // Sample data for the charts
       const last_week_events = message.last_week_events;
       const total_events_per_hour = message.total_events_per_hour;
       const total_events_per_hour_labels = message.total_events_per_hour_labels;
@@ -266,39 +268,21 @@
         options: {}
       });
 
-      // Dynamic string received from the router (replace this with your actual value)
       const urgencies_str = message.urg_txt;
-
-      // Update the canvas labeled "l1" with the dynamic string and image
-      const canvasL1 = document.getElementById('l1');
-      const ctxL1 = canvasL1.getContext('2d');
-      ctxL1.clearRect(0, 0, canvasL1.width, canvasL1.height); // Clear the canvas before updating
-      ctxL1.font = '20px Arial';
-      ctxL1.fillText(urgencies_str, 15, 20); // Adjust the position of the string as needed
-      ctxL1.stroke();
-
-      const canvasL2 = document.getElementById('l2');
       const events_str = message.events_txt;
-      const ctxL2 = canvasL2.getContext('2d');
-      ctxL2.clearRect(0, 0, canvasL2.width, canvasL2.height); // Clear the canvas before updating
-      ctxL2.font = '20px Arial';
-      ctxL2.fillText(events_str, 15, 20); // Adjust the position of the string as needed
-      ctxL2.stroke();
-
-      // const canvasL3 = document.getElementById('l3');
-      // const last_event_str = message.last_event;
-      // const ctxL3 = canvasL3.getContext('2d');
-      // ctxL3.clearRect(0, 0, canvasL3.width, canvasL3.height); // Clear the canvas before updating
-      // ctxL3.font = '20px Arial';
-      // ctxL3.fillText(last_event_str, 15, 20); // Adjust the position of the string as needed
-      // ctxL3.stroke();
-      const canvasL4 = document.getElementById('N');
-      canvasL4.innerHTML = message.last_event;
-      //canvasL4='akak';
+      const critical_events = document.getElementById('critical_events');
+      critical_events.innerHTML = urgencies_str;
+      const total_events = document.getElementById('total_events');
+      total_events.innerHTML = events_str;
+ 
+      const last_msg = document.getElementById('last_msg');
+      last_msg.innerHTML = message.last_event;
+      
       const last_update = document.getElementById('lastUpdateDate');
       const last_update_str = message.last_updated;
       last_update.textContent = last_update_str['last_updated'];
-      }
+      
+    }
   </script>
 </body>
 </html>
