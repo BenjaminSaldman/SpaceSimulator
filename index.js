@@ -168,9 +168,9 @@ dashboard_socket.on('connection', async (ws) => {
                 last_event+='<br>';
                 last_event+='DEC: degrees: '+hits[i].DEC.degrees+' minutes: '+ hits[i].DEC.minutes+' seconds: '+hits[i].DEC.seconds;
                 last_event+='<br>';
-                last_event +="Time Stamp: "+Date(hits[i].eventTS).toString();
+                last_event +="Time Stamp: "+new Date(hits[i].eventTS).toString();
               }else{
-                last_event +="Time Stamp: "+Date(hits[i].eventTS).toString();
+                last_event +="Time Stamp: "+new Date(hits[i].eventTS).toString();
               }
           }
           total_events += 1;
