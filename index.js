@@ -10,7 +10,7 @@ const path = require('path');
 const app = express();
 const ejs = require('ejs'); 
 const bodyParser = require('body-parser');
-const sun_info = require('./servers/sun_info_server'); // Starts the server of sun information.
+const sun_info = require('./adapters/sun_info_adapter'); // Starts the server of sun information.
 const connect_and_publish = require('./models/nasa_data');
 const WebSocket = require('ws');
 
